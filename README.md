@@ -33,35 +33,6 @@ A weather application built with **Django**, **Python** **JavaScript**, **APIs**
 
 ---
 
-## 📂 Project Structure
-venv/  
-│  Scripts/
-│  │
-│  ├── weather/ # Main Django app
-│  │ ├── migrations/ # DB migrations
-│  │ ├── templates/weather/ # HTML templates
-│  │ │ └── home.html
-│  │ ├── static/weather/ # CSS/JS
-│  │ │ └── home.js
-│  │ │ └── home.css
-│  │ ├── models.py # Location, WeatherQuery, WeatherRecord
-│  │ ├── views.py # CRUD + weather logic
-│  │ ├── urls.py # App routes
-│  │ ├── fetch_weather.py # OpenWeather API calls
-│  │ ├── geocode.py # Location geocoding
-│  │ ├── ml_utils.py # ML/NLP classifier
-│  │ └── serializers.py # DRF serializers
-│  │
-│  ├── weather_app/ # Django project root
-│  │ ├── settings.py
-│  │ ├── urls.py
-│  │ └── wsgi.py
-│  │
-│  ├── manage.py
-│  ├── requirements.txt
-│  └── README.md
-
-
 ## 📦 Requirements
 
 Main dependencies:
