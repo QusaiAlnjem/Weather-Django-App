@@ -1,0 +1,19 @@
+# Web / framework
+Django==5.2.5
+djangorestframework>=3.15
+
+# HTTP + geocoding
+requests>=2.31.0
+geopy>=2.3.0
+
+# Transformers / NLP
+torch
+transformers>=4.40.0,<5.0.0
+tokenizers>=0.13.0
+
+# Utilities
+python-dotenv>=1.0.0
+
+# Testing / dev
+pytest>=8.4.0
+pytest-django>=4.5.2

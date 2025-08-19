@@ -1,0 +1,192 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weloc - The Best Weather App</title>
+    <link rel="stylesheet" href="{% static 'weather/home.css' %}">
+  </head>
+    
+  <body>
+    <div class="header">
+      <h1>Weloc</h1>
+      <h3>Check Weather Conditions Fast!</h3>
+    </div>
+
+    <div class="location-section">
+      <!-- Warning Notification Section -->
+      <div class="warning-notification hidden" id="warningNotification">
+        <div class="warning-header">
+          <div class="warning-icon">⚠️</div>
+          <div class="warning-summary">
+            <span class="warning-count" id="warningCount">0</span> Weather Warning(s)
+          </div>
+          <div class="warning-actions">
+            <button class="learn-more-btn" id="learnMoreBtn">Learn More</button>
+            <button class="close-warning-btn" id="closeWarningBtn">×</button>
+          </div>
+        </div>
+        <div class="warning-details" id="warningDetails">
+          <div class="warning-list" id="warningList">
+            <!-- JavaScript -->
+          </div>
+        </div>
+      </div>
+  
+      <div class="container">
+        
+        <button class="location-btn" id="locationBtn">
+            📍 Check My Current Location
+        </button>
+        <div class="locmessage" id="locMessage">⚠️ Location Access Required!</div>
+      
+      </div>
+
+      <div class="divider">
+          <span>OR</span>
+      </div>
+
+      <div class="search-section">
+          <label class="search-label">Enter any location to check weather conditions</label>
+          <div class="search-container">
+              <input type="text" class="search-input" id="searchInput"
+                    placeholder="e.g. 70123, France, Paris, Eiffel Tower">
+              <button class="search-btn" id="searchBtn">🔍</button>
+          </div>
+      </div>
+
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Getting weather data...</p>
+      </div>
+
+      <div class="weather-display" id="weatherResult">
+        <div class="weather-header">
+          <div class="location-info">
+            <div class="location-name" id="locationName"></div>
+            <div class="address-type" id="addressType"></div>
+          </div>
+          <img class="weather-icon" id="weatherIcon" alt="Weather icon" />
+        </div>
+        <div class="weather-city" id="weatherCity"></div>
+        <div class="weather-temp" id="weatherTemp"></div>
+        <div class="weather-desc" id="weatherDesc"></div>
+        <div class="temperature" id="temperature"></div>
+        <div class="description" id="description"></div>
+        <div class="weather-details">
+          <div class="detail-item">
+            <div class="detail-label">Feels Like</div>
+            <div class="detail-value" id="feelsLike"></div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Humidity</div>
+            <div class="detail-value" id="humidity"></div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Wind Speed</div>
+            <div class="detail-value" id="windSpeed"></div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Visibility</div>
+            <div class="detail-value" id="visibility"></div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Sunrise</div>
+            <div class="detail-value" id="sunrise"></div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Sunset</div>
+            <div class="detail-value" id="sunset"></div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Country</div>
+            <div class="detail-value" id="country"></div>
+          </div>
+        </div>
+        
+        <!-- 7-Day Forecast Section -->
+        <div class="forecast-container" id="forecastContainer">
+          <!-- Forecast data will be populated by JavaScript -->
+        </div>
+      </div>
+
+      <div class="error" id="errorDiv">
+        <p id="errorMessageDiv"></p>
+      </div>
+      
+    </div>
+
+    <!-- CREATE -->
+    <h2>Create Queries</h2>
+    <h4 style="color: #356290; margin-top: 10px;">Check out for the most temperate day in any location and days range up to 5!</h4>
+    <form method="POST" action="{% url 'weather:create_query' %}">
+      {% csrf_token %}
+      <input type="text" name="location" placeholder="Enter location" required>
+      <input type="date" name="start_date" required>
+      <input type="date" name="end_date" required>
+      <button type="submit">Create Query</button>
+    </form>
+
+    <hr>
+
+    <!-- READ (list all queries) -->
+    <section id="savedQueries">
+      <h2>Saved Queries</h2>
+      {% if queries_with_best %}
+        <ul>
+          {% for item in queries_with_best %}
+            {% with q=item.query %}
+            <li>
+              <strong>{{ q.location.display_name }}</strong>
+              <div>Range: {{ q.start_date }} → {{ q.end_date }}</div>
+
+              {% if item.best_day %}
+                <div>
+                  🌤 Best day:
+                  <strong>{{ item.best_day }} ({{ item.best_temp }}°C)</strong>
+                </div>
+              {% else %}
+                <div>No temperature data available.</div>
+              {% endif %}
+
+              <details>
+                <summary>Show daily records</summary>
+                <ul>
+                  {% for r in item.records %}
+                    <li>
+                      {{ r.date }} — {{ r.temp_c }}°C
+                      <form method="POST" action="{% url 'weather:update_record' r.id %}" style="display:inline;">
+                        {% csrf_token %}
+                        <input name="temp_c" value="{{ r.temp_c }}" step="0.1" type="number" style="width:80px;">
+                        <button type="submit" class="update-btn">Update</button>
+                      </form>
+                    </li>
+                  {% endfor %}
+                </ul>
+              </details>
+
+              <form method="POST" action="{% url 'weather:delete_query' q.id %}">
+                {% csrf_token %}
+                <button type="submit" class="delete-btn">Delete Query</button>
+              </form>
+            </li>
+            {% endwith %}
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>No saved queries yet.</p>
+      {% endif %}
+    </section>
+
+    <script>
+      window.ENDPOINTS = {
+        getWeather: "{% url 'weather:get_weather' %}",
+        createQuery: "{% url 'weather:create_query' %}"
+      };
+    </script>
+    <script src="{% static 'weather/home.js' %}"></script>
+
+  </body>
+
+</html>
